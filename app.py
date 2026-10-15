@@ -111,12 +111,11 @@ X_HANDLE = "Osint613"
 X_LOOKBACK_MIN = 5
 X_SCROLL_PX_PER_SEC = 18
 X_TICKER_H = 168
+# FxTwitter publishes a real RSS feed for a public account. No API key.
+# Nitter mirrors are left as fallbacks; most of them are dead or bot-walled.
 X_RSS_URLS = [
-    "https://syndication.twitter.com/srv/timeline-profile/screen-name/Osint613",
-    "https://nitter.tiekoetter.com/Osint613/rss",
-    "https://nitter.meowing.monster/Osint613/rss",
-    "https://nitter.kareem.one/Osint613/rss",
-    "https://nitter.privacydev.net/Osint613/rss",
+    "https://fxtwitter.com/Osint613/feed.xml?count=20",
+    "https://fxtwitter.com/Osint613/feed.xml",
 ]
 # Used only when every live source fails and no fresher cache exists.
 X_SEED = [
@@ -995,7 +994,12 @@ def render_x_ticker():
 
     rows = []
     for p in shown:
-        stamp = p.get("when") or "--------T----Z"
+        stamp = "----Z"
+        if p.get("when"):
+            try:
+                stamp = parse_dtg(p["when"]).strftime("%H%MZ")
+            except ValueError:
+                stamp = p["when"]
         text = html.escape(p.get("text") or "")
         link = html.escape(p.get("link") or f"https://x.com/{X_HANDLE}", quote=True)
         rows.append(
